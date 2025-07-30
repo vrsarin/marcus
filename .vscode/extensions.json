@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "ms-python.pylint",
+        "ms-python.autopep8",
+        "sonarsource.sonarlint-vscode",
+        "ms-playwright.playwright"
+    ]
+}
