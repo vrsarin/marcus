@@ -1,0 +1,80 @@
+services:
+ 
+  sonar-db:
+    image: postgres
+    restart: always
+    container_name: sonar-db
+    environment:
+      - POSTGRES_DB=sonar_db
+      - POSTGRES_USER=sonar_user
+      - POSTGRES_PASSWORD=sonar_password
+      - TZ=America/New_York
+    volumes:
+      - ./.data/sonar-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar_user -d sonar_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sonar:
+    image: sonarqube:community
+    container_name: sonar
+    ports:
+      - 9000:9000
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://sonar-db:5432/sonar_db
+      - SONAR_JDBC_USERNAME=sonar_user
+      - SONAR_JDBC_PASSWORD=sonar_password
+    volumes:
+      # - sonar-data:/opt/sonarqube/data
+      - ./.data/sonar/data:/opt/sonarqube/data
+      - ./.data/sonar/logs:/opt/sonarqube/logs
+      - ./.data/sonar/extensions:/opt/sonarqube/extensions
+      - ./.data/sonar/temp:/opt/sonarqube/temp
+    depends_on:
+      sonar-db:
+        condition: service_healthy
+    healthcheck:
+      test: >
+        curl -s http://localhost:9000/api/system/status | grep '"status":"UP"' || exit 1
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+
+  app-db:
+    image: postgres
+    restart: always
+    container_name: app-db
+    environment:
+      - POSTGRES_DB=marcus_db
+      - POSTGRES_USER=marcus_user
+      - POSTGRES_PASSWORD=marcus_password
+      - TZ=America/New_York
+    ports:
+      - 5432:5432
+    volumes:
+      - ./.data/app-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marcus_user -d marcus_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  marcus:
+    # image: marcus
+    container_name: marcus
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      - DATABASE_URL=postgresql://marcus_user:marcus_password@app-db:5432/marcus_db
+    depends_on:
+      app-db:
+        condition: service_healthy
+      sonar:
+        condition: service_healthy
