@@ -8,4 +8,12 @@
         "connectionId": "http-localhost-9000",
         "projectKey": "marcus"
     },
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.analysis.extraPaths": [
+        "./src"
+    ]
 }

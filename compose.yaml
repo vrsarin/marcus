@@ -1,3 +1,5 @@
+# OpenTelemetry Collector service
+
 services:
  
   sonar-db:
@@ -62,7 +64,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+  otel-collector:
+    container_name: otel-collector
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4318:4318" # OTLP HTTP receiver
+    restart: unless-stopped
   marcus:
     # image: marcus
     container_name: marcus
@@ -71,8 +81,8 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 8000:8000
-    environment:
-      - DATABASE_URL=postgresql://marcus_user:marcus_password@app-db:5432/marcus_db
+    env_file:
+      - docker.env
     depends_on:
       app-db:
         condition: service_healthy

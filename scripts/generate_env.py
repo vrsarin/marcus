@@ -32,9 +32,9 @@ def extract_compose_info(compose_path=COMPOSE_PATH):
     info["sonar_project_key"] = os.environ.get("SONAR_PROJECT_KEY", DEFAULT_PROJECT_KEY)
     info["sonar_admin_user"] = os.environ.get("SONAR_ADMIN_USER", DEFAULT_ADMIN_USER)
     info["sonar_admin_pass"] = os.environ.get("SONAR_ADMIN_PASS", DEFAULT_ADMIN_PASS)
-    info["app_db_url"] = (
-        f"postgresql://{info['app_db_user']}:{info['app_db_password']}@app-db:5432/{info['app_db_db']}"
-    )
+    info["app_db_host"] = "app-db"
+    info["app_db_port"] = "5432"
+    info["app_db_name"] = info.get("app_db_db", "marcus_db")
 
     print(info)
     return info
@@ -122,9 +122,11 @@ context = {
     "sonar_db_url": info.get("sonar_jdbc_url", ""),
     "sonar_db_user": info.get("sonar_jdbc_username", ""),
     "sonar_db_password": info.get("sonar_jdbc_password", ""),
-    "app_db_url": info.get("app_db_url", ""),
+    "app_db_host": info.get("app_db_host", "app-db"),
+    "app_db_port": info.get("app_db_port", "5432"),
     "app_db_user": info.get("app_db_user", ""),
     "app_db_password": info.get("app_db_password", ""),
+    "app_db_name": info.get("app_db_name", "marcus_db"),
 }
 
 with open(".env", "w", encoding="utf-8") as f:

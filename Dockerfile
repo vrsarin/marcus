@@ -15,7 +15,7 @@ RUN pip install -r requirements.txt  --no-cache-dir
 # Only for production
 RUN pip install gunicorn  --no-cache-dir
 
-COPY ./marcus ./
+COPY ./src ./
 
 RUN adduser -u 5678 --disabled-password --gecos "" appuser 
 RUN chown -R appuser /app
@@ -23,7 +23,7 @@ USER appuser
 
 HEALTHCHECK CMD curl --fail http://localhost:8000/health || exit 1
 
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:api", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "marcus.main:api", "--bind", "0.0.0.0:8000"]
 
 
 

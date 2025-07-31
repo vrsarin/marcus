@@ -224,6 +224,6 @@ node_modules/
 /playwright/.cache/
 .env
 *.env
-.data/
+.data
 coverage.xml
 requirements.txt
